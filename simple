@@ -1,0 +1,212 @@
+Make server.js
+
+make a plan of action
+
+npm init to initalize our nodejs project
+package.json created !  //script node server.js is automatically created, we have not dont it 
+
+npm install express
+dependency added 
+
+in server.js 
+const express =  require('express');
+const app = express()   
+
+const server = require('http').Server(app);     // we dont install http its built in server
+
+...server.listen(3030);     //server is goint to be local host and port is 3030
+
+// root url ie /
+app.get('/', (req, res) => {         
+    res.status(200).send("Hello world")
+})                          
+
+how to run server
+npm install -g nodemon      // g to install it globally so basically we can use it anywhere
+app started running     (Hello world printed)
+
+new folder 
+views -> room.ejs       (embedded JS)(inside html)(we can pass variables(from the backend) in html doc(front end))
+
+npm install ejs
+
+//we dont need to import just write
+app.set('view engine', 'ejs');
+
+instead of the above line20 do this
+app.get('/', (req, res) => {
+    res.render('room');
+})
+
+//now the text from the view.ejs body will be displayed
+//we are actually using the view file from ejs.
+
+POA 
+intialize our nodejs project ... done ..
+intialize our first view ... done ..
+
+//create room id 
+uuid library
+npm install uuid 
+why ? 
+we need the unique id which is uuid
+uuid will generate random ids so for every specific room we have unique id.
+
+//import our uuid in server.js
+const { v4: uuidv4 } = require('uuid');     //importing the uuid library
+//certain version of uuid - v4
+
+// we have to do localhost:3030 -> have it with room id 
+
+//new url 
+room is like a parameter
+app.get('/:room', (req, res) => {
+    res.render('room', { roomId: req.params.room });
+})
+
+//req.params.room is roomId parameter 
+
+in line38 res.render('room'); instead of this we write 
+res.redirect(`/${uuidv4()}`);       //main route by default but it is redirected 
+
+//instead of rendering it there we are now redirecting it so we have it with uuid 
+
+//url with room id will be in your browser now 
+
+//inside room.ejs 
+<script>
+        console.log("<%= roomId %>");           //the room id in the url same thing afodsfhraoyifbsaofdsbfd
+</script>
+//use of ejs also is done here
+
+create a room id ... done ...
+
+create a public folder -> new file script.js    (where our JS for the front-end going to live)
+import it in room.ejs 
+
+//inside server.js
+app.use(express.static('public'));
+//to tell server that our public files our also gonna be included
+
+//create a video element
+//inside script.js 
+//get user media will accept an object
+//it is a promise (an event in future which will be either resolved or rejected)
+
+let myvideoStream       //global variable 
+
+navigator.mediaDevices.getUserMedia({       //helps us video and audio offer from chrome
+    video: true,    //attribute video set to true 
+    audio: true 
+}).then(stream => {         //.then means if user gave permission to his cameera/audio after that what will happen...
+
+    //stream is just like a video 
+    //inside it is a es6 function 
+    myVideoStream = stream;     //receiving the stream 
+    addVideoStream(myVideo, stream);
+
+    });   
+
+//function taking video object and stream 
+const addVideoStream = (video, stream) => {
+
+    //play this stream 
+    video.srcObject = stream;
+    // load the data for this stream ie play video 
+    video.addEventListener('loadedmetadata', () => {
+        video.play();
+    })
+    videoGrid.append(video);
+}
+
+//creating a video element
+const myVideo =  document.createElement('video');
+myVideo.muted = true;   //mute ourselves
+
+addVideoStream(myVideo, stream); // inside .then() line106
+
+//inside room.ejs
+//creating a video grid inside where our video will be played
+
+//const videoGrid = document.getElementById('video-grid'); inside script.js 
+//then 
+//videoGrid.append(video);      line119
+
+//make sure you include scirpt -> script.js at the end okay!
+
+//our video displaying !!!!!!!!!!!!!!!
+
+//style.css
+//link it in room.ejs
+
+style #video-grid
+
+style "video" which is the actual video inside video grid 
+
+//Add the ability to view our own video -> DONE
+
+//now lets do 
+- Add ability to allow others to stream their video
+
+//socket.io     //library which uses web sockets
+                //real time communication
+// with http as a client you can only make a request to the server
+// the server cannot send a request to you 
+
+// but with socket.io both can communicate with one another
+// the server can also send a request
+// like a channel created between the two
+
+//install socket.io 
+npm install socket.io
+
+//import that inside server.js 
+const io = require('socket.io')(server) 
+
+// lets create a connection 
+// .on means when we visit the site / we are connected 
+// inside it the first thing is 
+// the user will join the room 
+
+// import script socket.io inside room.js (don't write defer - which means it will be loaded last)
+
+// const socket = io('/'); importing in script.js
+
+//  emit it inside script.js 
+//  simply socket.emit('join room');  in script.js 
+//  and in server.js we are accepting it  
+
+inside server.js 
+io.on('connection', socket => {
+    socket.on('join-room', () => {
+        console.log("joined room");
+    })
+})
+
+// joined room will be consoled
+// but we now actually need to join the room 
+
+// inside ejs 
+// const ROOM_ID = "<%= roomId %>";
+
+// join the room with this specific room id which is coming from line 189
+    
+    socket.emit('join-room', ROOM_ID, id);  //scipt.js 
+
+//inside server.js
+    socket.join(roomId); 
+    
+    socket.broadcast.to(roomId).emit('user-connected', userId);     // somebody joined your room and this will be displayed and his stream will be added to your window  
+    
+    socket.on("user-connected", (userId) => {
+        setTimeout(function () {
+            connecToNewUser(userId, stream);    //we will create this function 
+        }, 1000);
+
+const connecToNewUser = (userId, stream) => {
+    console.log('new-user');
+}
+
+
+//if you open two screens then new-user will be consoled.
+1:24:51 
